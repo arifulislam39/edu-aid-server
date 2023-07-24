@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.4bttisu.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -33,6 +33,54 @@ async function run() {
     const collegeCollection = client.db("eduaidDB").collection("colleges");
     const researchCollection = client.db("eduaidDB").collection("researches");
     const reviewCollection = client.db("eduaidDB").collection("reviews");
+
+//get 3 colleges
+    app.get("/college", async (req, res) => {
+        const result = await collegeCollection.find().limit(3).toArray();
+        res.send(result);
+      });
+
+      //get all colleges
+    app.get("/colleges", async (req, res) => {
+        const result = await collegeCollection.find().toArray();
+        res.send(result);
+      });
+
+      //single college
+      app.get("/college/:id", async (req, res) => {
+        const id = req.params.id;
+        console.log(id);
+        const query = { _id: new ObjectId(id) };
+  
+        const result = await collegeCollection.findOne(query);
+  
+        res.send(result);
+        console.log(result);
+      });
+
+
+      app.get("/searchByCollegeName/:text", async (req, res) => {
+        const searchName = req.params.text;
+        const query = { college_name: { $regex: searchName, $options: "i" } };
+        const result = await collegeCollection.find(query).toArray();
+        res.send(result);
+        console.log(result);
+      });
+
+
+
+      //get all research paper
+      app.get("/researchPaper", async (req, res) => {
+        const result = await researchCollection.find().toArray();
+        res.send(result);
+      });
+
+
+      //get all reviews
+      app.get("/reviews", async (req, res) => {
+        const result = await reviewCollection.find().toArray();
+        res.send(result);
+      });
 
 
     await client.connect();
