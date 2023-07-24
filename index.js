@@ -33,6 +33,8 @@ async function run() {
     const collegeCollection = client.db("eduaidDB").collection("colleges");
     const researchCollection = client.db("eduaidDB").collection("researches");
     const reviewCollection = client.db("eduaidDB").collection("reviews");
+    const bookingCollege = client.db("eduaidDB").collection("booking");
+   
 
 //get 3 colleges
     app.get("/college", async (req, res) => {
@@ -57,6 +59,20 @@ async function run() {
         res.send(result);
         console.log(result);
       });
+
+       //booking College
+    app.post("/college", async (req, res) => {
+      const item = req.body;
+      const result = await bookingCollege.insertOne(item);
+      res.send(result);
+    });
+
+
+    //get my college
+    app.get("/myCollege", async (req, res) => {
+      const result = await bookingCollege.find().toArray();
+      res.send(result);
+    });
 
 
       app.get("/searchByCollegeName/:text", async (req, res) => {
